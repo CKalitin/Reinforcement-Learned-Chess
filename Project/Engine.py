@@ -12,11 +12,9 @@ class Engine:
         now = datetime.datetime.now()
         self.board = chess.Board()
         self.gameName = f'Neural-Net-v1_{now.strftime("%H:%M:%S").replace(":", ".")}'
-        print(self.board)
-        pass
     
     def EndGame(self):
-        pass
+        self.SaveGame()
     
     def PlayMove(self, move):
         try:
@@ -28,8 +26,6 @@ class Engine:
             pushMove = chess.Move.from_uci(move)
             self.board.push(pushMove)
             
-            print(self.board)
-            
             if self.board.outcome() != None:
                 print(self.board.outcome())
                 return self.board.outcome()
@@ -40,10 +36,6 @@ class Engine:
             print(f"Invalid move: {move} | {error}")
             return -1
             
-    
-    def GetBoardState(self):
-        pass
-    
     # Must be done before game reset
     def SaveGame(self):
         now = datetime.datetime.now()
@@ -56,7 +48,7 @@ class Engine:
         game.headers["Round"] = "x"
         game.headers["White"] = "AI"
         game.headers["Black"] = "Another AI?"
-        #game.headers["Result"] = self.board.outcome()
+        if (self.board.outcome() != None): game.headers["Result"] = self.board.outcome()
         
         node = game.add_variation(self.board.move_stack[0])
         for move in self.board.move_stack:
