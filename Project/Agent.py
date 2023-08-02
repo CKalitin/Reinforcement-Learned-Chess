@@ -9,7 +9,7 @@ class Agent:
         while(True):
             move=input("Move:")
             self.engine.PlayMove(move)
-            pass
+            self.engine.SaveGame()
 
 if __name__ == '__main__':
     agent = Agent()
