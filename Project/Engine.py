@@ -3,14 +3,15 @@ import datetime
 import os
 from chess import pgn
 
+almostPromotionFEN = "8/P7/8/1k6/8/8/6K1/8"
+
 class Engine:
     def __init__(self):
-        self.board = chess.Board()
         pass
     
     def BeginGame(self):
         now = datetime.datetime.now()
-        self.board = chess.Board()
+        self.board = chess.Board(almostPromotionFEN)
         self.gameName = f'Neural-Net-v1_{now.strftime("%H:%M:%S").replace(":", ".")}'
     
     def EndGame(self):
@@ -23,8 +24,7 @@ class Engine:
                 print(f"Move Illegal: {move}")
                 return -1
             
-            pushMove = chess.Move.from_uci(move)
-            self.board.push(pushMove)
+            self.board.push_uci(move)
             
             if self.board.outcome() != None:
                 print(self.board.outcome())

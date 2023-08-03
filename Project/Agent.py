@@ -38,24 +38,28 @@ class Agent:
             if letter == "q": index = iters + 256
             if letter == "k": index = iters + 320
             
-            # If is lowercase ie. black
-            if whiteOnTop and letter == x: index += 384
-            if not whiteOnTop and letter.upper() == x: index += 384
+            if whiteOnTop and letter == x: index += 384 # If is lowercase ie. black
+            if not whiteOnTop and letter.upper() == x: index += 384 # If is uppercase ie. white
             state[index] = 1
             iters += 1
         
-        self.PrintState(state)
+        #PrintState(state)
         
         return np.array(state, dtype=int)
+    
+    
+def PrintState(state):
+    output = ""
+    for x in range(0, int(len(state) / 8)):
+        if x % 8 == 0: output += "\n"
+        x *= 8
+        output += f'\n{state[x]} {state[x + 1]} {state[x + 2]} {state[x + 3]} {state[x + 4]} {state[x + 5]} {state[x + 6]} {state[x + 7]}'
+    output += "\n"
+    print(output)
 
-    def PrintState(self, state):
-        output = ""
-        for x in range(0, int(len(state) / 8)):
-            if x % 8 == 0: output += "\n"
-            x *= 8
-            output += f'\n{state[x]} {state[x + 1]} {state[x + 2]} {state[x + 3]} {state[x + 4]} {state[x + 5]} {state[x + 6]} {state[x + 7]}'
-        output += "\n"
-        print(output)
+def ModelOutputToMove():
+    # because it might be playing as black
+    pass
 
 if __name__ == '__main__':
     agent = Agent()
