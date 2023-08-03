@@ -123,3 +123,9 @@ castlingMoves = ["e1g1", "e1c1", "d1f1", "d1b1"]
 print(f'King Moves: {len(kingMoves) + len(castlingMoves)}')
 
 print(len(pawnFowardMoves) + len(pawnPromotionMoves) + len(pawnCaptureMoves) + len(pawnEnPassantMoves) + len(knightMoves) + len(bishopMoves) + len(rookMoves) + len(queenMoves) + len(kingMoves))
+
+# print every array combined into one
+output = pawnFowardMoves + pawnPromotionMoves + pawnCaptureMoves + pawnEnPassantMoves + knightMoves + bishopMoves + rookMoves + queenMoves + kingMoves
+print(len(output))
+print((output))
+      
