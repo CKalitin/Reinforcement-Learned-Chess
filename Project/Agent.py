@@ -57,9 +57,14 @@ def PrintState(state):
     output += "\n"
     print(output)
 
-def ModelOutputToMove():
-    # because it might be playing as black
-    pass
+def FlipMoveOnBoard(move):
+    # The model might be playing as black, so the moves need to be flipped
+    outputMove = move[0] + str(9 - int(move[1])) + move[2] + str(9 - int(move[3]))
+    return outputMove
+
+print(f"e1e2: {FlipMoveOnBoard('e1e2')}")
+print(f"g3e5: {FlipMoveOnBoard('g3e5')}")
+print(f"e8g8: {FlipMoveOnBoard('e8g8')}")
 
 if __name__ == '__main__':
     agent = Agent()
