@@ -13,6 +13,8 @@ class Agent:
     def __init__(self):
         self.engine = E.Engine()
         self.transitionMoves = 40 # Transition between START and END in ConstantData.py
+        self.previousWhiteReward = 0
+        self.previousBlackReward = 0
         self.numGames = 0
         self.epsilon = 0 # Randomness
         self.gamma = 0.9 # Discount rate
@@ -22,11 +24,31 @@ class Agent:
         
     def Loop(self):
         self.engine.BeginGame()
+        self.previousWhiteReward = self.GetTotalBoardReward(True)
+        self.previousBlackReward = self.GetTotalBoardReward(False)
         while(True):
             print(self.engine.board)
+            
+            isWhite = len(self.engine.board.move_stack) % 2 == 0
+            
+            print("Previous White Reward: ", self.previousWhiteReward)
+            print("Previous Black Reward: ", self.previousBlackReward)
+            
             move=input("Move: ")
             self.engine.PlayMove(move)
-            self.GetState(True)
+            self.GetState(isWhite)
+            
+            boardReward = self.GetTotalBoardReward(isWhite)
+            if isWhite:
+                reward = boardReward - self.previousWhiteReward
+                self.previousWhiteReward = boardReward
+            else:
+                reward = boardReward - self.previousBlackReward
+                self.previousBlackReward = boardReward
+                
+            print("Previous White Reward: ", self.previousWhiteReward)
+            print("Previous Black Reward: ", self.previousBlackReward)
+            print("Reward: ", reward)
             
     def GetState(self, whiteOnTop = True):
         state = [0] * 768
@@ -62,17 +84,17 @@ class Agent:
         
         return np.array(state, dtype=int)
     
-    def PlayMove(self, modelOutput):
+    def PlayMove(self, modelOutput, isWhite):
         modelOutput = modelOutput.sort(reversed=True)
-        print(modelOutput)
+        print("Model output: ", modelOutput)
         
         moveResult = 0
         iters = 0
         while iters < 10:
             move = ConstantData.MODEL_OUTPUT_MOVES[modelOutput[iters]]
-            if len(self.engine.board.move_stack) % 2 != 0: FlipMoveOnBoard(move) # If not white's turn
-            print(len(self.engine.board.move_stack))
-            print(move)
+            if not isWhite: FlipMoveOnBoard(move) # If not white's turn
+            print("move stack ", len(self.engine.board.move_stack))
+            print("move: ", move)
             moveResult = self.engine.PlayMove(move)
             if (moveResult >= 0): break
             iters += 1
@@ -82,8 +104,10 @@ class Agent:
                 return
         return self.RewardFunction(), moveResult, iters
             
-    def RewardFunction(self):
+    def RewardFunction(self, move):
         pass
+    
+    # this is stupid and not how you do reward, just take the target square of a move and the piece used
     
     def GetTotalBoardReward(self, isWhite):
         # Loop through board
@@ -91,8 +115,20 @@ class Agent:
         
         # Remove spaces
         boardString = str(self.engine.board).replace(" ", "").replace("\n", "")
-        if isWhite: boardString.replace("p", ".").replace("n", ".").replace("b", ".").replace("r", ".").replace("q", ".").replace("k", ".")
-        else: boardString.replace("P", ".").replace("N", ".").replace("B", ".").replace("R", ".").replace("Q", ".").replace("K", ".")
+        print("board string: ", boardString)
+        if isWhite: boardString = boardString.replace("p", ".").replace("n", ".").replace("b", ".").replace("r", ".").replace("q", ".").replace("k", ".")
+        else: boardString = boardString.replace("P", ".").replace("N", ".").replace("B", ".").replace("R", ".").replace("Q", ".").replace("K", ".")
+        
+        print("board string: ", boardString)
+        if not isWhite: # Flip Board
+            newBoardString = ""
+            for x in range(0, 8):
+                for y in range(0, 8):
+                    newBoardString += boardString[((7 - x)*8)+y]
+            boardString = newBoardString
+        print("board string: ", boardString)
+        
+        print("move stack ", self.engine.board.move_stack)
         iters = 0
         reward = 0
         for x in str(boardString):
@@ -101,8 +137,6 @@ class Agent:
                 continue
             
             letter = x.lower()
-            
-            print(self.engine.board.move_stack)
             # Transition between start rewards and end rewards, (initReward / transitionMoves * (transitionMoves - moves)) + (endReward / transitionMoves * moves) = reward
             if letter == "p": reward += (ConstantData.PAWN_START_REWARD[iters] / self.transitionMoves * (self.transitionMoves - (len(self.engine.board.move_stack) / 2))) + (ConstantData.PAWN_END_REWARD[iters] / self.transitionMoves * (len(self.engine.board.move_stack) / 2))
             if letter == "n": reward += ConstantData.KNIGHT_REWARD[iters]
@@ -202,8 +236,6 @@ def PrintPieceRewards():
 
 def Train():
     pass
-
-PrintPieceRewards()
 
 if __name__ == '__main__':
     agent = Agent()
