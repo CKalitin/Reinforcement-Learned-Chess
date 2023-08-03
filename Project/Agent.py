@@ -1,9 +1,21 @@
 import Engine as E
+import Model
 import numpy as np
+from collections import deque
+
+MAX_MEMORY = 100_000
+BATCH_SIZE = 1000
+LR = 0.001 # Learning Rate
 
 class Agent:
     def __init__(self):
         self.engine = E.Engine()
+        self.numGames = 0
+        self.epsilon = 0 # Randomness
+        self.gamma = 0.9 # Discount rate
+        self.memory = deque(maxlen=MAX_MEMORY) # popleft() on max memory
+        self.model = Model.Linear_QNET(768, 2048, 8192, 3888) # Making up numbers
+        self.trainer = Model.QTrainer(self.model, lr=LR, gamma=self.gamma)
         
     def Loop(self):
         self.engine.BeginGame()
@@ -46,6 +58,9 @@ class Agent:
         #PrintState(state)
         
         return np.array(state, dtype=int)
+    
+    def GetMove(self, state):
+        pass
     
     
 def PrintState(state):
