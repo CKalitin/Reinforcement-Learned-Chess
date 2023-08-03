@@ -2,6 +2,7 @@ import Engine as E
 import Model
 import numpy as np
 from collections import deque
+import random
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
@@ -78,31 +79,42 @@ class Agent:
         
         return np.array(state, dtype=int)
     
-    def GetMove(self, state):
-        pass
-    
-    def PlayMove(self, modelOutput, isWhite=True):
+    def PlayMove(self, modelOutput):
         modelOutput = modelOutput.sort(reversed=True)
         print(modelOutput)
         
+        moveResult = 0
         iters = 0
         while iters < 10:
             move = MODEL_OUTPUT_MOVES[modelOutput[iters]]
-            len(self.engine.board.move_stack) % 2 != 0: FlipMoveOnBoard(move) # If not white's turn
+            if len(self.engine.board.move_stack) % 2 != 0: FlipMoveOnBoard(move) # If not white's turn
             print(len(self.engine.board.move_stack))
             print(move)
-            # Get game result here and return it
-            if (self.engine.PlayMove(move) == 0): break
+            moveResult = self.engine.PlayMove(move)
+            if (moveResult >= 0): break
             iters += 1
-            if iters >= 10: 
-                print(f"No valid moves found. {modelOutput}")
+            if iters >= 50: 
+                print(f"No valid moves found.\n{modelOutput}")
                 self.engine.SaveGame()
                 return
-        return self.RewardFunction(), self.engine.board.result()
+        return self.RewardFunction(), moveResult, iters
             
     def RewardFunction(self):
         pass
+    
+    def remember(self, state, action, reward, nextState, done):
+        self.memory.append((state, action, reward, nextState, done)) # Adds tuple to memory
+    
+    def trainLongMemory(self):
+        if len(self.memory) > BATCH_SIZE: miniSample = random.sample(self.memory, BATCH_SIZE) # Returns list of tuples
+        else: miniSample = self.memory
         
+        states, actions, rewards, nextStates, dones = zip(*miniSample)
+        
+        self.trainer.trainStep(states, actions, rewards, nextStates, dones)
+    
+    def trainShortMemory(self, state, action, reward, nextState, done):
+        self.trainer.trainStep(state, action, reward, nextState, done)
     
     
 def PrintState(state):
@@ -119,9 +131,8 @@ def FlipMoveOnBoard(move):
     outputMove = move[0] + str(9 - int(move[1])) + move[2] + str(9 - int(move[3]))
     return outputMove
 
-print(f"e1e2: {FlipMoveOnBoard('e1e2')}")
-print(f"g3e5: {FlipMoveOnBoard('g3e5')}")
-print(f"e8g8: {FlipMoveOnBoard('e8g8')}")
+def Train():
+    pass
 
 if __name__ == '__main__':
     agent = Agent()

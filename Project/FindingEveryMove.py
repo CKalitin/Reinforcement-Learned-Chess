@@ -41,14 +41,15 @@ print("Every Move: ", len(everyMove))
 
 board = chess.Board()
 
-def playMove(move, piece, secondMove = None, secondPiece = None):
+def playMove(move, piece, secondPos = None, secondPiece = None):
     board.clear()
-    board.set_piece_at(chess.parse_square(move[0:2]), chess.Piece.from_symbol(piece))
-    try:
-        if (secondMove != None):
-            board.set_piece_at(chess.parse_square(secondMove[0:2]), chess.Piece.from_symbol(secondPiece))
-    except:
-        pass
+    board.set_piece_at(chess.parse_square(move[0:2]), chess.Piece.from_symbol(piece.upper()))
+    
+    if (secondPos != None):
+        board.set_piece_at(chess.parse_square(secondPos), chess.Piece.from_symbol(secondPiece.lower()))
+        print(move[0:2], secondPos, chess.Piece.from_symbol(secondPiece.lower()))
+        #print(board)
+        
     try:
         # Move example "e2e4"
         if CheckMoveLegal(move, board) == 0:
@@ -128,4 +129,35 @@ print(len(pawnFowardMoves) + len(pawnPromotionMoves) + len(pawnCaptureMoves) + l
 output = pawnFowardMoves + pawnPromotionMoves + pawnCaptureMoves + pawnEnPassantMoves + knightMoves + bishopMoves + rookMoves + queenMoves + kingMoves
 print(len(output))
 print((output))
-      
+
+print("Invalid Moves: ")
+
+pawnMoves = pawnFowardMoves + pawnPromotionMoves
+for move in pawnMoves:
+    if (playMove(move, "P") != 0):
+        print("Invalid Move: ", move)
+
+pawnMoves = pawnCaptureMoves
+for move in pawnMoves:
+    if (playMove(move, "P", move[2:4], "P") != 0):
+        print("Invalid Move: ", move)
+
+for move in knightMoves:
+    if (playMove(move, "N") != 0):
+        print("Invalid Move: ", move)
+        
+for move in bishopMoves:
+    if (playMove(move, "B") != 0):
+        print("Invalid Move: ", move)
+        
+for move in rookMoves:
+    if (playMove(move, "R") != 0):
+        print("Invalid Move: ", move)
+        
+for move in queenMoves:
+    if (playMove(move, "Q") != 0):
+        print("Invalid Move: ", move)
+        
+for move in kingMoves:
+    if (playMove(move, "K") != 0):
+        print("Invalid Move: ", move)

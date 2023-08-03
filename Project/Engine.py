@@ -2,8 +2,10 @@ import chess
 import datetime
 import os
 from chess import pgn
+import traceback
+import Agent
 
-almostPromotionFEN = "8/P7/8/1k6/8/8/6K1/8"
+almostPromotionFEN = "8/1P2Q3/8/k7/8/8/6K1/8"
 
 class Engine:
     def __init__(self):
@@ -11,7 +13,7 @@ class Engine:
     
     def BeginGame(self):
         now = datetime.datetime.now()
-        self.board = chess.Board(almostPromotionFEN)
+        self.board = chess.Board()#almostPromotionFEN)
         self.gameName = f'Neural-Net-v1_{now.strftime("%H:%M:%S").replace(":", ".")}'
     
     def EndGame(self):
@@ -33,7 +35,7 @@ class Engine:
             
             return 0
         except Exception as error:
-            print(f"Invalid move: {move} | {error}")
+            print(f"Invalid move: {move} | {error.with_traceback()}")
             return -1
             
     # Must be done before game reset
@@ -48,7 +50,7 @@ class Engine:
         game.headers["Round"] = "x"
         game.headers["White"] = "AI"
         game.headers["Black"] = "Another AI?"
-        if (self.board.outcome() != None): game.headers["Result"] = self.board.outcome()
+        if (self.board.outcome() != None): game.headers["Result"] = str(self.board.outcome())
         
         node = game.add_variation(self.board.move_stack[0])
         for move in self.board.move_stack:

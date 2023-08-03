@@ -1,0 +1,15 @@
+Trello's bad, txt ftw
+
+Ideas:
+1. Create an initial training step that shows the NN legal and illegal moves
+2. Separate black and white pieces into separate neurons - Instead of 1 for white and -1 for black
+3. Add a minmax process after the NN to modify the output of the top recommended moves - Slightly cheaty because it isn't a pure Neural Net anymore
+4. Apply Reward function v1 for a certain percentage of moves, training long memory handles it
+
+Todo:
+1. Verify all the moves
+2. Reward Function (Piece Positions / Taking Pieces / Losing Pieces)
+3. Save Model
+
+Sources:
+https://www.chess.com/blog/the_real_greco/another-silly-question-how-many-chess-moves-are-there
