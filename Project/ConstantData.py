@@ -81,3 +81,7 @@ KING_END_REWARD = [-20, -10, -10, -10, -10, -10, -10, -20,
                    -25, -20,  20,  25,  25,  20, -20, -25,
                    -30, -25,   0,   0,   0,   0, -25, -30,
                    -50, -30, -30, -30, -30, -30, -30, -50]
+PIECE_VALUE = { 'p':20, 'n':60, 'b':80, 'r':100, 'q':180, 'k':0, '.':0 }
+WHITE_PIECES = { 'P', 'N', 'B', 'R', 'Q', 'K' }
+BLACK_PIECES = { 'p', 'n', 'b', 'r', 'q', 'k' }
+INITIAL_PIECE_VALUE = PIECE_VALUE['p']*8+PIECE_VALUE['n']*2+PIECE_VALUE['b']*2+PIECE_VALUE['r']*2+PIECE_VALUE['q']
