@@ -95,24 +95,22 @@ class Agent:
         return reward, moveResult, iters
     
     # Run before the move executed, the old board is needed to get the piece used and the piece at the target square
+    # Using FlipPositionOnBoard() is necessary because the board is flipped for display purposes, (black is on top in the console)
     def RewardFunction(self, move, isWhite):
-        # Currently this is buggy
-        # When a capture takes place, the no reward is given, capture reward, loss reward, and piece position reward are not given
-        # Also, 
-        
         reward = 0
-        #if isWhite: move = FlipMoveOnBoard(move) # ConstantData is flipped to make it easier to look at, so this is necessary
         boardString = str(self.engine.board).replace(" ", "").replace("\n", "")
-        piece = boardString[PositionToIndex(move[0:2])].lower()
-        targetSquare = PositionToIndex(move[2:4]) 
+        initialSquare = PositionToIndex(FlipPositionOnBoard(move[0:2]))
+        piece = boardString[initialSquare].lower()
+        targetSquare = PositionToIndex(FlipPositionOnBoard(move[2:4])) 
         targetPiece = boardString[targetSquare]
         
         print(boardString)
+        print(initialSquare, targetSquare)
         print(move, piece, targetSquare, targetPiece)
         
         # Piece position reward
         # Transition between start rewards and end rewards, (initReward / transitionMoves * (transitionMoves - moves)) + (endReward / transitionMoves * moves) = reward
-        if isWhite: targetSquare = PositionToIndex(FlipPositionOnBoard(move[2:4])) # ConstantData is flipped to make it easier to look at, so this is necessary
+        if not isWhite: targetSquare = PositionToIndex(move[2:4]) # Unflip the target square for black
         if piece == "p": reward += (ConstantData.PAWN_START_REWARD[targetSquare] / self.transitionMoves * (self.transitionMoves - (len(self.engine.board.move_stack) / 2))) + (ConstantData.PAWN_END_REWARD[targetSquare] / self.transitionMoves * (len(self.engine.board.move_stack) / 2))
         elif piece == "n": reward += ConstantData.KNIGHT_REWARD[targetSquare]
         elif piece == "b": reward += ConstantData.BISHOP_REWARD[targetSquare]
@@ -121,63 +119,28 @@ class Agent:
         elif piece == "k": reward += (ConstantData.KING_START_REWARD[targetSquare] / self.transitionMoves * (self.transitionMoves - (len(self.engine.board.move_stack) / 2))) + (ConstantData.KING_START_REWARD[targetSquare] / self.transitionMoves * (len(self.engine.board.move_stack) / 2))
         print("Piece position reward: ", reward)
         
+        # Promotion reward
+        if len(move) > 4:
+            if move[4] in ConstantData.PIECE_VALUE: reward += ConstantData.PIECE_VALUE[move[4]]
+        
         # Losing/Taking pieces
         if isWhite: 
             self.preivoueBlackLostPiece = targetPiece.lower()
             reward -= ConstantData.PIECE_VALUE[self.preivousWhiteLostPiece]
             print("Piece lost reward: -", ConstantData.PIECE_VALUE[self.preivousWhiteLostPiece])
             if targetPiece in ConstantData.BLACK_PIECES: reward += ConstantData.PIECE_VALUE[targetPiece]
-            print("Piece taken reward: ", ConstantData.PIECE_VALUE[targetPiece])
+            if targetPiece in ConstantData.BLACK_PIECES: print("Piece taken reward: ", ConstantData.PIECE_VALUE[targetPiece])
         else: 
             self.preivousWhiteLostPiece = targetPiece.lower()
             reward -= ConstantData.PIECE_VALUE[self.preivoueBlackLostPiece]
             print("Piece lost reward: -", ConstantData.PIECE_VALUE[self.preivoueBlackLostPiece])
             if targetPiece in ConstantData.WHITE_PIECES: reward += ConstantData.PIECE_VALUE[targetPiece.lower()]
-            print("Piece taken reward: ", ConstantData.PIECE_VALUE[targetPiece.lower()])
+            if targetPiece in ConstantData.WHITE_PIECES: print("Piece taken reward: ", ConstantData.PIECE_VALUE[targetPiece.lower()])
         
+        print(boardString)
         return reward
     
     # this is stupid and not how you do reward, just take the target square of a move and the piece used
-    
-    def GetTotalBoardReward(self, isWhite):
-        # Loop through board
-        # Cross reference with reward list per piece
-        
-        # Remove spaces
-        boardString = str(self.engine.board).replace(" ", "").replace("\n", "")
-        print("board string: ", boardString)
-        if isWhite: boardString = boardString.replace("p", ".").replace("n", ".").replace("b", ".").replace("r", ".").replace("q", ".").replace("k", ".")
-        else: boardString = boardString.replace("P", ".").replace("N", ".").replace("B", ".").replace("R", ".").replace("Q", ".").replace("K", ".")
-        
-        print("board string: ", boardString)
-        if not isWhite: # Flip Board
-            newBoardString = ""
-            for x in range(0, 8):
-                for y in range(0, 8):
-                    newBoardString += boardString[((7 - x)*8)+y]
-            boardString = newBoardString
-        print("board string: ", boardString)
-        
-        print("move stack ", self.engine.board.move_stack)
-        iters = 0
-        reward = 0
-        for x in str(boardString):
-            if x == ".":
-                iters += 1
-                continue
-            
-            letter = x.lower()
-            # Transition between start rewards and end rewards, (initReward / transitionMoves * (transitionMoves - moves)) + (endReward / transitionMoves * moves) = reward
-            if letter == "p": reward += (ConstantData.PAWN_START_REWARD[iters] / self.transitionMoves * (self.transitionMoves - (len(self.engine.board.move_stack) / 2))) + (ConstantData.PAWN_END_REWARD[iters] / self.transitionMoves * (len(self.engine.board.move_stack) / 2))
-            elif letter == "n": reward += ConstantData.KNIGHT_REWARD[iters]
-            elif letter == "b": reward += ConstantData.BISHOP_REWARD[iters]
-            elif letter == "r": reward += ConstantData.ROOK_REWARD[iters]
-            elif letter == "q": reward += ConstantData.QUEEN_REWARD[iters]
-            elif letter == "k": reward += (ConstantData.KING_START_REWARD[iters] / self.transitionMoves * (self.transitionMoves - (len(self.engine.board.move_stack) / 2))) + (ConstantData.KING_START_REWARD[iters] / self.transitionMoves * (len(self.engine.board.move_stack) / 2))
-            
-            iters += 1
-            
-        return reward
     
     def remember(self, state, action, reward, nextState, done):
         self.memory.append((state, action, reward, nextState, done)) # Adds tuple to memory
