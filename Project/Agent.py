@@ -4,23 +4,37 @@ import numpy as np
 from collections import deque
 import random
 import ConstantData
+import time
+import numpy as np
+import torch
+import math
+import datetime
+import os
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
 LEARNING_RATE = 0.001 # Learning Rate
 
 class Agent:
+    # Config
+    transitionMoves = 40 # Transition between START and END in ConstantData.py
+    initialRandomness = 0.75
+    numRandomMoves = 1000
+    preivousWhiteLostPiece = '.'
+    preivoueBlackLostPiece = '.'
+    useRandomMoves = True
+    movesToTry = 3888
+    gamma = 0.9 # Discount rate
+        
     def __init__(self):
         self.engine = E.Engine()
-        self.transitionMoves = 99999999999999999 # Transition between START and END in ConstantData.py
-        self.preivousWhiteLostPiece = '.'
-        self.preivoueBlackLostPiece = '.'
         self.numGames = 0
         self.epsilon = 0 # Randomness
-        self.gamma = 0.9 # Discount rate
+        self.totalNumMoves = 0
         self.memory = deque(maxlen=MAX_MEMORY) # popleft() on max memory
         self.model = Model.Linear_QNET(768, 2048, 8192, 3888) # Making up numbers
         self.trainer = Model.QTrainer(self.model, lr=LEARNING_RATE, gamma=self.gamma)
+        self.model.loadModel()
         
     def Loop(self):
         self.engine.BeginGame()
@@ -72,27 +86,46 @@ class Agent:
         
         return np.array(state, dtype=int)
     
+    def GetModelOutput(self, state):
+        if self.useRandomMoves:
+            self.epsilon = self.initialRandomness * np.clip(abs(self.totalNumMoves / self.numRandomMoves - 1), 0, 1)
+            modelOutput = [0] * self.model.linear3.out_features
+            if (random.randint(0, 100) / 100 > self.epsilon):
+                state0 = torch.tensor(state, dtype=torch.float)
+                modelOutput = self.model(state0)
+            else: 
+                for x in range(0, self.movesToTry):
+                    modelOutput[random.randint(0, self.model.linear3.out_features - 1)] = 1 - (x / self.movesToTry)
+                modelOutput = torch.tensor(modelOutput, dtype=torch.float)
+            return modelOutput
+        else:
+            state0 = torch.tensor(state, dtype=torch.float)
+            modelOutput = self.model(state0)
+        return modelOutput
+    
     def PlayMove(self, modelOutput, isWhite):
-        modelOutput = modelOutput.sort(reversed=True)
-        print("Model output: ", modelOutput)
+        modelOutput = (torch.sort(modelOutput, descending=True)).indices # Sort and get the indices
         
         reward = 0
-        moveResult = 0
+        termination = 0
         iters = 0
-        while iters < 10:
+        outputMove = 0
+        while iters < self.movesToTry:
             move = ConstantData.MODEL_OUTPUT_MOVES[modelOutput[iters]]
-            if not isWhite: FlipMoveOnBoard(move) # If not white's turn
-            print("move stack ", len(self.engine.board.move_stack))
-            print("move: ", move)
+            outputMove = move
+            if not isWhite: FlipMoveOnBoard(move) # If not white's turn, flip the move
+            #print("move: ", move, modelOutput[iters], iters)
             reward = self.RewardFunction(move, isWhite)
-            moveResult = self.engine.PlayMove(move)
-            if (moveResult >= 0): break
+            termination = self.engine.PlayMove(move)
+            if (termination >= 0):
+                if len(self.engine.board.move_stack) % 20 == 0:
+                    print(f"Move: {move}\tIters: {iters}\tMove Number: {math.ceil(len(self.engine.board.move_stack) / 2)}")
+                break
             iters += 1
-            if iters >= 50: 
+            if iters >= self.movesToTry: 
                 print(f"No valid moves found.\n{modelOutput}")
-                self.engine.SaveGame()
-                return
-        return reward, moveResult, iters
+                return "error"
+        return reward, termination, iters, outputMove
     
     # Run before the move executed, the old board is needed to get the piece used and the piece at the target square
     # Using FlipPositionOnBoard() is necessary because the board is flipped for display purposes, (black is on top in the console)
@@ -104,10 +137,6 @@ class Agent:
         targetSquare = PositionToIndex(FlipPositionOnBoard(move[2:4])) 
         targetPiece = boardString[targetSquare]
         
-        print(boardString)
-        print(initialSquare, targetSquare)
-        print(move, piece, targetSquare, targetPiece)
-        
         # Piece position reward
         # Transition between start rewards and end rewards, (initReward / transitionMoves * (transitionMoves - moves)) + (endReward / transitionMoves * moves) = reward
         if not isWhite: targetSquare = PositionToIndex(move[2:4]) # Unflip the target square for black
@@ -117,7 +146,6 @@ class Agent:
         elif piece == "r": reward += ConstantData.ROOK_REWARD[targetSquare]
         elif piece == "q": reward += ConstantData.QUEEN_REWARD[targetSquare]
         elif piece == "k": reward += (ConstantData.KING_START_REWARD[targetSquare] / self.transitionMoves * (self.transitionMoves - (len(self.engine.board.move_stack) / 2))) + (ConstantData.KING_START_REWARD[targetSquare] / self.transitionMoves * (len(self.engine.board.move_stack) / 2))
-        print("Piece position reward: ", reward)
         
         # Promotion reward
         if len(move) > 4:
@@ -127,17 +155,12 @@ class Agent:
         if isWhite: 
             self.preivoueBlackLostPiece = targetPiece.lower()
             reward -= ConstantData.PIECE_VALUE[self.preivousWhiteLostPiece]
-            print("Piece lost reward: -", ConstantData.PIECE_VALUE[self.preivousWhiteLostPiece])
             if targetPiece in ConstantData.BLACK_PIECES: reward += ConstantData.PIECE_VALUE[targetPiece]
-            if targetPiece in ConstantData.BLACK_PIECES: print("Piece taken reward: ", ConstantData.PIECE_VALUE[targetPiece])
         else: 
             self.preivousWhiteLostPiece = targetPiece.lower()
             reward -= ConstantData.PIECE_VALUE[self.preivoueBlackLostPiece]
-            print("Piece lost reward: -", ConstantData.PIECE_VALUE[self.preivoueBlackLostPiece])
             if targetPiece in ConstantData.WHITE_PIECES: reward += ConstantData.PIECE_VALUE[targetPiece.lower()]
-            if targetPiece in ConstantData.WHITE_PIECES: print("Piece taken reward: ", ConstantData.PIECE_VALUE[targetPiece.lower()])
         
-        print(boardString)
         return reward
     
     # this is stupid and not how you do reward, just take the target square of a move and the piece used
@@ -155,6 +178,11 @@ class Agent:
     
     def trainShortMemory(self, state, action, reward, nextState, done):
         self.trainer.trainStep(state, action, reward, nextState, done)
+    
+    def BeginGame(self):
+        self.engine.BeginGame()
+        self.preivousWhiteLostPiece = '.'
+        self.preivoueBlackLostPiece = '.'
     
     
 def PrintState(state):
@@ -180,8 +208,72 @@ def PositionToIndex(position):
     return (int(position[1]) - 1) * 8 + letterToIndex[position[0]]
 
 def Train():
-    pass
+    agent = Agent()
+    agent.BeginGame()
+    
+    while(True):
+        time.sleep(0.1)
+            
+        isWhite = len(agent.engine.board.move_stack) % 2 == 0
+        
+        initialState = agent.GetState(isWhite)
+        modelOutput = agent.GetModelOutput(initialState)
+        reward, termination, iters, move = agent.PlayMove(modelOutput, isWhite)
+        if reward == "error": 
+            print("Error")
+            continue
+        agent.totalNumMoves += 1
+        newState = agent.GetState(isWhite)
+        done = termination > 0
+        if termination == 1: reward += 2000 # checkmate
+        elif termination == 2: reward -= 1000 # stalemate
+        elif termination == 3: reward -= 1000 # insufficient_material
+        elif termination == 5: reward -= 1000 # is_fivefold_repitition
+        moveIndex = ConstantData.MODEL_OUTPUT_MOVES.index(move)
+        
+        agent.trainShortMemory(initialState, moveIndex, reward, newState, done)
+        agent.remember(initialState, moveIndex, reward, newState, done)
+        if done:
+            agent.numGames += 1
+            agent.trainLongMemory()
+            
+            #agent.model.save(f"Model_{agent.engine.gameName[14:]}.pth")
+            agent.model.save(f"Model.pth")
+            
+            print(f"Game {agent.numGames}, Ended in: {math.ceil(len(agent.engine.board.move_stack) / 2)} moves, Termination: {termination}")
+            
+            agent.engine.SaveGame()
+            agent.BeginGame()
+
+def PlayAgainst():
+    agent = Agent()
+    agent.BeginGame()
+    
+    print(agent.engine.board)
+    while(True):
+        isWhite = len(agent.engine.board.move_stack) % 2 == 0
+        
+        moveFound = False
+        while not moveFound:
+            move=input("Move: ")
+            if agent.engine.PlayMove(move) >= 0: 
+                agent.totalNumMoves += 1
+                moveFound = True
+        
+        initialState = agent.GetState(isWhite)
+        modelOutput = agent.GetModelOutput(initialState)
+        reward, termination, iters, move = agent.PlayMove(modelOutput, isWhite)
+        print("AI Move: " + move)
+        if reward == "error": 
+            print("Error")
+            continue
+        agent.totalNumMoves += 1
+        
+        print(agent.engine.board)
+        
 
 if __name__ == '__main__':
-    agent = Agent()
-    agent.Loop()
+    #agent = Agent()
+    #agent.Loop() # Play Manually
+    Train()
+    #PlayAgainst()

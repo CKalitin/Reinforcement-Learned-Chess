@@ -1,0 +1,3 @@
+
+Error writing game to file:
+{error}

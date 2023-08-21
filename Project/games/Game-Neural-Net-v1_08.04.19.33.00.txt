@@ -1,0 +1,9 @@
+[Event "Neural-Net-v1_08.04.19.33.00"]
+[Site "192.168.1.73"]
+[Date "08/04/23"]
+[Round "x"]
+[White "AI"]
+[Black "Another AI?"]
+[Result "Outcome(termination=<Termination.FIVEFOLD_REPETITION: 5>, winner=None)"]
+
+1. a3 c5 2. g4 c4 3. Bh3 Na6 4. b4 cxb3 5. c4 Rb8 6. Bb2 b5 7. Ra2 Rb6 8. Ra1 Rb7 9. Ra2 Rb8 10. Ra1 Rb6 11. Ra2 Rb7 12. Ra1 Rb8 13. Ra2 f5 14. Ra1 fxg4 15. Ra2 g3 16. Ra1 gxf2+ 17. Kf1 e6 18. Qxb3 Bd6 19. Ra2 Be5 20. Qa4 Bd6 21. Ra1 Be7 22. Ra2 Bd6 23. Ra1 Qg5 24. Ra2 Qg4 25. Ra1 Be7 26. Ra2 Bd6 27. Ra1 Be7 28. Ra2 Bd6 29. Ra1 Be7 30. Ra2 Bd6 31. Ra1 Be7 32. Ra2 Bd6 Outcome(termination=<Termination.FIVEFOLD_REPETITION: 5>, winner=None)

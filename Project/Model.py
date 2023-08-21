@@ -19,15 +19,22 @@ class Linear_QNET(nn.Module):
         x = self.linear3(x)
         return x
 
-    def save(self):
-        modelFolderPath = './models'
+    def save(self, fileName=None):
+        modelFolderPath = '.\models'
         if not os.path.exists(modelFolderPath):
             os.makedirs(modelFolderPath)
         
         now = datetime.datetime.now()
-        fileName = f'model_{now.strftime("%H:%M:%S").replace(":", ".")}.pth'
+        if fileName == None: fileName = f'model_{now.strftime("%m:%d:%H:%M:%S").replace(":", ".")}.pth'
         fileName = os.path.join(modelFolderPath, fileName)
         torch.save(self.state_dict(), fileName)
+
+    def loadModel(self, fileName=None):
+        modelFolderPath = '.\models'
+        if fileName == None: fileName = sorted(os.listdir(modelFolderPath))[-1]
+        fileName = os.path.join(modelFolderPath, fileName)
+        self.load_state_dict(torch.load(fileName))
+        print(f"Loaded Model: {fileName}")
 
 
 class QTrainer:
@@ -50,10 +57,10 @@ class QTrainer:
         return pp
 
     def trainStep(self, state, action, reward, nextState, done):
-        state = torch.tensor(state, dtype=torch.float)
-        nextState = torch.tensor(nextState, dtype=torch.float)
-        action = torch.tensor(action, dtype=torch.long)
-        reward = torch.tensor(reward, dtype=torch.float)
+        state = torch.tensor(np.array(state), dtype=torch.float)
+        nextState = torch.tensor(np.array(nextState), dtype=torch.float)
+        action = torch.tensor(np.array(action), dtype=torch.long)
+        reward = torch.tensor(np.array(reward), dtype=torch.float)
         
         if len(state.shape) == 1:
             state = torch.unsqueeze(state, 0)

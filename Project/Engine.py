@@ -14,7 +14,7 @@ class Engine:
     def BeginGame(self):
         now = datetime.datetime.now()
         self.board = chess.Board()#almostPromotionFEN)
-        self.gameName = f'Neural-Net-v1_{now.strftime("%H:%M:%S").replace(":", ".")}'
+        self.gameName = f'Neural-Net-v1_{now.strftime("%m:%d:%H:%M:%S").replace(":", ".")}'
     
     def EndGame(self):
         self.SaveGame()
@@ -23,14 +23,13 @@ class Engine:
         try:
             # Move example "e2e4"
             if (self.CheckMoveLegal(move)) == 0:
-                print(f"Move Illegal: {move}")
+                #print(f"Move Illegal: {move}")
                 return -1
             
             self.board.push_uci(move)
             
             if self.board.outcome() != None:
-                print(self.board.outcome())
-                return self.board.outcome()
+                return self.board.outcome().termination.value
             # https://python-chess.readthedocs.io/en/latest/core.html#outcome
             
             return 0
@@ -62,7 +61,11 @@ class Engine:
         if (os.path.isfile(path)): f = open(path, "w")
         else: f = open(path, "x")
         
-        f.write(str(game))
+        try:
+            f.write(str(game))
+        except Exception as error:
+            f.write(f"\nError writing game to file:\n{error}\n\n")
+            f.write(str(self.board.move_stack))
         f.close()
     
     # Return 1 if legal, return 0 if illegal

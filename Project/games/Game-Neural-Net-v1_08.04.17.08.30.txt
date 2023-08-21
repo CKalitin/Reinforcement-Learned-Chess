@@ -1,0 +1,9 @@
+[Event "Neural-Net-v1_08.04.17.08.30"]
+[Site "192.168.1.73"]
+[Date "08/04/23"]
+[Round "x"]
+[White "AI"]
+[Black "Another AI?"]
+[Result "Outcome(termination=<Termination.FIVEFOLD_REPETITION: 5>, winner=None)"]
+
+1. a3 Nh6 2. e4 b6 3. h4 Bb7 4. Rh2 c5 5. h5 d5 6. Rh4 d4 7. Nc3 f6 8. Nce2 f5 9. Rb1 Nf7 10. Nh3 Qd7 11. g3 fxe4 12. Bg2 e3 13. Bd5 Qc8 14. Bf3 Nd8 15. Bc6+ Qd7 16. Bb5 Bh1 17. Bc6 Qxc6 18. c4 Qb5 19. Qb3 Qa5 20. Qb4 cxb4 21. fxe3 Qa6 22. e4 Qa4 23. Kf2 Qa6 24. Kf1 Qa4 25. axb4 Qxb4 26. Ke1 Qa4 27. Kf2 Qb4 28. Kf1 Qa4 29. Ke1 Qb4 30. Nf2 Qa4 31. Rxh1 Qb4 32. Rh2 Qa4 33. Rh4 Qb4 34. Rh1 Qa4 35. Rh2 Qb4 36. Rh4 Qa4 37. Rh1 Qb4 38. Rh2 Qa4 39. Rh4 Qb4 40. Rh1 Qa4 41. Rh2 Qb4 42. Rh3 Qa4 43. Ra1 Qb4 44. Ra5 Qa4 45. Rc5 Nf7 46. Rc6 Kd7 47. Rc7+ Ke8 48. Rc8+ Kd7 49. c5 Qb4 50. c6+ Ke6 51. c7 Kd7 52. Kd1 e5 53. Ke1 Ke7 54. Kd1 Qxd2+ 55. Bxd2 Rg8 56. Ke1 a6 57. Bc3 Ra7 58. Rh2 Rxc7 59. Rh4 Rxc8 60. Rh2 Kd8 61. Rh4 Ke7 62. Nd3 Kd8 63. Rh2 Kd7 64. Rh4 Ke8 65. Ba5 Bd6 66. Bb4 Kf8 67. Bc3 a5 68. Kd2 Rc7 69. Kc2 Rc8 70. h6 Rc7 71. Rh5 Re7 72. Rh4 Ra7 73. Be1 Re7 74. Rh5 Ra7 75. Rh4 Re7 76. Rh5 Ra7 77. Rh4 Re7 78. Rg4 Re8 79. Rg5 Ke7 80. Kb3 Ref8 81. Rh5 Rd8 82. Ka4 Rd7 83. Rh4 Ke6 84. Rg4 Re7 85. b3 Rd7 86. Rh4 Re7 87. Rg4 Ra7 88. Rg5 Kd7 89. Rh5 Ke8 90. Rxe5+ Kf8 91. Rf5 Ke7 92. Rh5 Ra6 93. Ng1 Ke8 94. Rb5 Kf8 95. Re5 Rh8 96. Re7 Kxe7 97. Bxa5 Re8 98. b4 Rf8 99. Ka3 Rg8 100. Ka4 Kf8 101. hxg7+ Rxg7 102. Ka3 Kg8 103. Ka4 Be7 104. Ka3 Bf8 105. Ka4 bxa5 106. Nc1 Rc6 107. Kb3 Ra6 108. Ka4 Rc6 109. bxa5 Ra6 110. Kb3 Rc6 111. Ka4 Ra6 112. Kb3 Rc6 113. Ka4 Ra6 114. Kb3 Rc6 115. Ka4 Ra6 116. Kb3 Rc6 117. Ka4 Outcome(termination=<Termination.FIVEFOLD_REPETITION: 5>, winner=None)

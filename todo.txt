@@ -7,10 +7,9 @@ Ideas:
 4. Apply Reward function v1 for a certain percentage of moves, training long memory handles it
 
 Todo:
-1. Reward Function (Piece Positions / Taking Pieces / Losing Pieces)
-2. Train/Test the model
-3. Save Model
-4. Performance Tracking
+1. Integrate the model with the game - Train/Test the model
+2. Load Model
+3. Performance Tracking
 
 Sources:
 https://www.chess.com/blog/the_real_greco/another-silly-question-how-many-chess-moves-are-there

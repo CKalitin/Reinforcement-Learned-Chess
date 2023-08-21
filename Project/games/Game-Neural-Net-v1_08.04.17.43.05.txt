@@ -1,0 +1,3 @@
+
+Error writing game to file:
+san() and lan() expect move to be legal or null, but got a3a2 in rnb3nr/p1Kpp2p/2p3pb/1p4p1/8/3P4/RPP1PPPP/1NB1KBNR b - - 0 13
