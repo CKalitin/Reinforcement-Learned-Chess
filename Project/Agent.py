@@ -15,6 +15,8 @@ MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
 LEARNING_RATE = 0.001 # Learning Rate
 
+previousTime = datetime.datetime.now()
+
 class Agent:
     # Config
     transitionMoves = 40 # Transition between START and END in ConstantData.py
@@ -119,7 +121,7 @@ class Agent:
             termination = self.engine.PlayMove(move)
             if (termination >= 0):
                 if len(self.engine.board.move_stack) % 20 == 0:
-                    print(f"Move: {move}\tIters: {iters}\tMove Number: {math.ceil(len(self.engine.board.move_stack) / 2)}")
+                    print(f"Move: {move}\tIters: {iters}\tMove Number: {math.ceil(len(self.engine.board.move_stack) / 2)}\tTime: {datetime.datetime.now().strftime('%H:%M:%S')}")
                 break
             iters += 1
             if iters >= self.movesToTry: 
@@ -207,32 +209,46 @@ def PositionToIndex(position):
     letterToIndex = { 'a':0, 'b':1, 'c':2, 'd':3, 'e':4, 'f':5, 'g':6, 'h':7 }
     return (int(position[1]) - 1) * 8 + letterToIndex[position[0]]
 
+def PrintTimeSince(prefix, previousTime):
+    now = datetime.datetime.now()
+    time = now - previousTime
+    print(f"{prefix}: {time.seconds}.{time.microseconds // 1000}")
+    return now
+
 def Train():
+    global previousTime
+    
     agent = Agent()
     agent.BeginGame()
     
     while(True):
-        time.sleep(0.1)
-            
         isWhite = len(agent.engine.board.move_stack) % 2 == 0
         
+        previousTime = PrintTimeSince("Begining", previousTime)
         initialState = agent.GetState(isWhite)
+        previousTime = PrintTimeSince("Get State Complete", previousTime)
         modelOutput = agent.GetModelOutput(initialState)
+        previousTime = PrintTimeSince("Model Output Complete", previousTime)
         reward, termination, iters, move = agent.PlayMove(modelOutput, isWhite)
         if reward == "error": 
             print("Error")
             continue
         agent.totalNumMoves += 1
+        previousTime = PrintTimeSince("Board Move Complete", previousTime)
         newState = agent.GetState(isWhite)
+        previousTime = PrintTimeSince("Get State Complete", previousTime)
         done = termination > 0
         if termination == 1: reward += 2000 # checkmate
         elif termination == 2: reward -= 1000 # stalemate
         elif termination == 3: reward -= 1000 # insufficient_material
         elif termination == 5: reward -= 1000 # is_fivefold_repitition
         moveIndex = ConstantData.MODEL_OUTPUT_MOVES.index(move)
+        previousTime = PrintTimeSince("Termination Complete", previousTime)
         
         agent.trainShortMemory(initialState, moveIndex, reward, newState, done)
+        previousTime = PrintTimeSince("Short Memory Training Complete", previousTime)
         agent.remember(initialState, moveIndex, reward, newState, done)
+        previousTime = PrintTimeSince("Remember Complete", previousTime)
         if done:
             agent.numGames += 1
             agent.trainLongMemory()

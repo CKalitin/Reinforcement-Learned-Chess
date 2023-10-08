@@ -1,0 +1,15 @@
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\bin\Debug\net6.0\Reinforcement-Learned-Chess.exe
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\bin\Debug\net6.0\Reinforcement-Learned-Chess.deps.json
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\bin\Debug\net6.0\Reinforcement-Learned-Chess.runtimeconfig.json
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\bin\Debug\net6.0\Reinforcement-Learned-Chess.dll
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\bin\Debug\net6.0\Reinforcement-Learned-Chess.pdb
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\obj\Debug\net6.0\Reinforcement-Learned-Chess.csproj.AssemblyReference.cache
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\obj\Debug\net6.0\Reinforcement-Learned-Chess.GeneratedMSBuildEditorConfig.editorconfig
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\obj\Debug\net6.0\Reinforcement-Learned-Chess.AssemblyInfoInputs.cache
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\obj\Debug\net6.0\Reinforcement-Learned-Chess.AssemblyInfo.cs
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\obj\Debug\net6.0\Reinforcement-Learned-Chess.csproj.CoreCompileInputs.cache
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\obj\Debug\net6.0\Reinforcement-Learned-Chess.dll
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\obj\Debug\net6.0\refint\Reinforcement-Learned-Chess.dll
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\obj\Debug\net6.0\Reinforcement-Learned-Chess.pdb
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\obj\Debug\net6.0\Reinforcement-Learned-Chess.genruntimeconfig.cache
+G:\_Dev\Python\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\Reinforcement-Learned-Chess\obj\Debug\net6.0\ref\Reinforcement-Learned-Chess.dll
